@@ -3,7 +3,8 @@ use std::sync::atomic::Ordering;
 
 pub mod lab2;
 use lab2::declarations::{MIN_ARGS, MAX_ARGS, PROGRAM_NAME_INDEX, CONFIG_FILE_INDEX, 
-                         VERBOSE_FLAG_INDEX, BAD_COMMAND_LINE_ERROR, WHINGE_MODE, SCRIPT_GENERATION_ERROR, SUCCESS};
+                         VERBOSE_FLAG_INDEX, BAD_COMMAND_LINE_ERROR, SUCCESS,
+                         WHINGE_MODE,};
 use lab2::play::Play;
 use lab2::return_wrapper::ReturnWrapper;
 
