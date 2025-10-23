@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::io::BufRead;
 
-use super::declarations::{SCRIPT_GENERATION_ERROR};
+use super::declarations::{FAILED_TO_OPEN_FILE, FAILED_TO_READ_LINE_FROM_FILE};
 
 pub fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Result<(), u8> {
     // The core function used for extracting data from files
@@ -11,7 +11,7 @@ pub fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Re
         Ok(f) => f,
         Err(error_code) => {
             eprintln!("Error: Failed to open file '{}': {}", filename, error_code);
-            return Err(SCRIPT_GENERATION_ERROR);
+            return Err(FAILED_TO_OPEN_FILE);
         }
     };
     
@@ -25,7 +25,7 @@ pub fn grab_trimmed_file_lines(filename: &String, lines: &mut Vec<String>) -> Re
             Ok(bytes) => bytes,
             Err(error_code) => {
                 eprintln!("Error: Failed to read line from file '{}': {}", filename, error_code);
-                return Err(SCRIPT_GENERATION_ERROR);
+                return Err(FAILED_TO_READ_LINE_FROM_FILE);
             }
         };
         

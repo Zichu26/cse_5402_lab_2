@@ -104,15 +104,18 @@ impl SceneFragment {
         !self.title.trim().is_empty()
     }
 
-    fn print_title(&self) {
+    fn print_title(&self, is_first: bool) {
         if !self.title.trim().is_empty() {
+            if !is_first {
+                println!(); // Blank line before scene title (except first)
+            }
             println!("{}", self.title);
             println!();
         }
     }
 
     pub fn enter(&self, previous: &SceneFragment) {
-        self.print_title();
+        self.print_title(false);
         for player in &self.players {
             // Check if player was in previous scene
             let in_previous = previous.players.iter().any(|p| p.name() == player.name());
@@ -123,7 +126,7 @@ impl SceneFragment {
     }
 
     pub fn enter_all(&self) {    
-        self.print_title();
+        self.print_title(true);
         for player in &self.players {
             println!("[Enter {}.]", player.name());
         }

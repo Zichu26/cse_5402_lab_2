@@ -1,8 +1,8 @@
 use std::sync::atomic::Ordering;
-use super::declarations::{WHINGE_MODE, SCRIPT_GENERATION_ERROR};
+use super::declarations::WHINGE_MODE;
 use super::script_gen::grab_trimmed_file_lines;
 
-pub type PlayLines = Vec<(usize, String)>; // (line_number line_text)
+pub type PlayLines = Vec<(usize, String)>; // (line_number, line_text)
 
 pub struct Player {
     name: String,
@@ -46,8 +46,8 @@ impl Player {
     pub fn prepare(&mut self, part_filename: &String) -> Result<(), u8> {
         let mut part_lines: Vec<String> = Vec::new();
         
-        if let Err(_error_code) = grab_trimmed_file_lines(part_filename, &mut part_lines) {
-            return Err(SCRIPT_GENERATION_ERROR);
+        if let Err(error_code) = grab_trimmed_file_lines(part_filename, &mut part_lines) {
+            return Err(error_code);
         }
 
         // Process each line and add to player's lines
@@ -62,7 +62,7 @@ impl Player {
     }
 
     pub fn speak(&mut self, current_speaker: &mut String) {
-        // return if all lines have already been printed
+        // return if all lines have already been spoken
         if self.index >= self.lines.len() {
             return;
         }
