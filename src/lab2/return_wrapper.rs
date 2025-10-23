@@ -1,5 +1,5 @@
 use std::process::{ExitCode, Termination};
-use lab2::declarations::Success;
+use super::declarations::SUCCESS;
 
 pub struct ReturnWrapper {
     code: u8,
@@ -13,7 +13,7 @@ impl ReturnWrapper {
 
 impl Termination for ReturnWrapper {
     fn report(self) -> ExitCode {
-        if self.code != Success {
+        if self.code != SUCCESS {
             eprintln!("Error: {}", self.code);
         }
         ExitCode::from(self.code)

@@ -1,14 +1,12 @@
 use std::sync::atomic::Ordering;
 use super::player::Player;
-use super::declarations::{WHINGE_MODE, SCRIPT_GENERATION_ERROR};
+use super::declarations::{WHINGE_MODE, CONFIG_PARSING_ERROR};
 use super::script_gen::grab_trimmed_file_lines;
 
-pub type PlayConfig = Vec<(String, String)>; // (character_name, part_file_name)
-
-pub const TITLE_LINE_INDEX: usize = 0;        
-pub const FIRST_CHARACTER_LINE_INDEX: usize = 1; 
-pub const CHARACTER_NAME_INDEX: usize = 0;
-pub const PART_FILE_NAME_INDEX: usize = 1;
+pub type PlayConfig = Vec<(String, String)>; // (part_name, part_filename)
+      
+pub const PART_NAME_INDEX: usize = 0;
+pub const PART_FILENAME_INDEX: usize = 1;
 pub const CONFIG_LINE_TOKEN_COUNT: usize = 2;
 
 pub struct SceneFragment {
@@ -28,7 +26,7 @@ impl SceneFragment {
         for config_entry in config {
             match config_entry {
                 (part_name, part_filename) => {
-                    // Create a new Player instance using the character name
+                    // Create a new Player instance using the part name
                     let mut player = Player::new(part_name);
                     
                     // Call prepare on the player with the part filename
@@ -44,25 +42,25 @@ impl SceneFragment {
         Ok(())
     }
 
-    fn add_config(&mut self, config_line: &String, config: &mut PlayConfig) {
-        let tokens: Vec<&str> = config_line.split_whitespace().collect();
+    fn add_config(&mut self, line: &String, config: &mut PlayConfig) {
+        let tokens: Vec<&str> = line.split_whitespace().collect();
         
         if tokens.len() != CONFIG_LINE_TOKEN_COUNT {
             if WHINGE_MODE.load(Ordering::SeqCst) {
                 if tokens.len() < CONFIG_LINE_TOKEN_COUNT {
                     eprintln!("Warning: Configuration line has too few tokens (expected {}, got {}): '{}'", 
-                            CONFIG_LINE_TOKEN_COUNT, tokens.len(), config_line);
+                            CONFIG_LINE_TOKEN_COUNT, tokens.len(), line);
                 } else {
                     eprintln!("Warning: Configuration line has too many tokens (expected {}, got {}): '{}'", 
-                            CONFIG_LINE_TOKEN_COUNT, tokens.len(), config_line);
+                            CONFIG_LINE_TOKEN_COUNT, tokens.len(), line);
                 }
             }
         }
         
         if tokens.len() >= CONFIG_LINE_TOKEN_COUNT {
             config.push((
-                tokens[CHARACTER_NAME_INDEX].to_string(),
-                tokens[PART_FILE_NAME_INDEX].to_string()
+                tokens[PART_NAME_INDEX].to_string(),
+                tokens[PART_FILENAME_INDEX].to_string()
             ));
         }
     }
@@ -70,13 +68,13 @@ impl SceneFragment {
     pub fn read_config(&mut self, config_filename: &String, config: &mut PlayConfig) -> Result<(), u8> {
         let mut config_lines: Vec<String> = Vec::new();
         
-        if let Err(_error_code) = grab_trimmed_file_lines(config_filename, &mut config_lines) {
-            return Err(SCRIPT_GENERATION_ERROR);
+        if let Err(error_code) = grab_trimmed_file_lines(config_filename, &mut config_lines) {
+            return Err(error_code);
         }
-        
-        if config_lines.len() < 2 {
-            eprintln!("Error: Configuration file must contain at least 2 lines (title and one character)");
-            return Err(SCRIPT_GENERATION_ERROR);
+
+        if config_lines.is_empty() {
+            eprintln!("Error: Config file '{}' contains no lines", config_filename);
+            return Err(CONFIG_PARSING_ERROR);
         }
         
         for line in &config_lines {
@@ -86,24 +84,24 @@ impl SceneFragment {
         Ok(())
     }
 
-    pub fn has_title(&self) -> bool {
-        !self.title.trim().is_empty()
-    }
-
     pub fn prepare(&mut self, config_filename: &String) -> Result<(), u8> {
         let mut config: PlayConfig = Vec::new();
         
-        if let Err(_error_code) = self.read_config(config_filename, &mut config) {
-            return Err(SCRIPT_GENERATION_ERROR);
+        if let Err(error_code) = self.read_config(config_filename, &mut config) {
+            return Err(error_code);
         }
         
-        if let Err(_error_code) = self.process_config(&config) {
-            return Err(SCRIPT_GENERATION_ERROR);
+        if let Err(error_code) = self.process_config(&config) {
+            return Err(error_code);
         }
 
         self.players.sort();
         
         Ok(())
+    }
+
+    pub fn has_title(&self) -> bool {
+        !self.title.trim().is_empty()
     }
 
     fn print_title(&self) {
@@ -112,6 +110,10 @@ impl SceneFragment {
             println!();
         }
     }
+
+
+
+    
 
     pub fn enter(&self, previous: &SceneFragment) {
         self.print_title();
