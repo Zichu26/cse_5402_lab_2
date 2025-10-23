@@ -71,7 +71,6 @@ impl Player {
         if *current_speaker != self.name {
             // Update the current speaker to this player's name
             *current_speaker = self.name.clone();
-            
             println!();
             println!("{}.", self.name);
         }

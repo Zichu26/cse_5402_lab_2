@@ -111,14 +111,10 @@ impl SceneFragment {
         }
     }
 
-
-
-    
-
     pub fn enter(&self, previous: &SceneFragment) {
         self.print_title();
         for player in &self.players {
-            // Check if player was in the previous scene
+            // Check if player was in previous scene
             let in_previous = previous.players.iter().any(|p| p.name() == player.name());
             if !in_previous {
                 println!("[Enter {}.]", player.name());
@@ -135,7 +131,7 @@ impl SceneFragment {
 
     pub fn exit(&self, next: &SceneFragment) {
         for player in self.players.iter().rev() {
-            // Check if this player will be in the next scene
+            // Check if this player will be in next scene
             let in_next = next.players.iter().any(|p| p.name() == player.name());
             if !in_next {
                 println!("[Exit {}.]", player.name());
@@ -161,7 +157,7 @@ impl SceneFragment {
                 if let Some(line_num) = player.next_line() {
                     // next_line_number is_none() means we haven't found any player with a line yet in this iteration
                     // this is the first player we've encountered who has lines remaining, 
-                    // so we should record their information.
+                    // which by default is the next line number.
                     if next_line_number.is_none() || line_num < next_line_number.unwrap() {
                         next_line_number = Some(line_num);
                         next_player_index = Some(index);
@@ -200,5 +196,4 @@ impl SceneFragment {
             self.players[player_index].speak(&mut current_speaker);
         }
     }
-
 }

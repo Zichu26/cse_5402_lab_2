@@ -134,6 +134,7 @@ impl Play {
             
             self.fragments[i].recite();
             
+            println!();
             if i == num_fragments - 1 {
                 // Final fragment
                 self.fragments[i].exit_all();
