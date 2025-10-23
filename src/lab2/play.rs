@@ -1,10 +1,15 @@
 use std::sync::atomic::Ordering;
 use super::scene_fragment::SceneFragment;
-use super::declarations::{WHINGE_MODE, SCRIPT_GENERATION_ERROR};
+use super::declarations::{WHINGE_MODE, SCRIPT_PARSING_ERROR};
 use super::script_gen::grab_trimmed_file_lines;
 
 pub type ScriptConfig = Vec<(bool, String)>;
 pub type Fragments = Vec<SceneFragment>;
+
+const CONFIG_FILENAME_INDEX: usize = 0;
+const CONFIG_SCRIPT_LENGTH: usize = 1;
+const SCENE_SCRIPT_INDEX: usize = 0;
+const SCENE_SCRIPT_LENGTH: usize = 2;
 
 pub struct Play {
     fragments: Fragments,
@@ -29,8 +34,8 @@ impl Play {
                     } else {
                         let mut fragment = SceneFragment::new(&title);
                         title = String::new();
-                        if let Err(_error_code) = fragment.prepare(text) {
-                            return Err(SCRIPT_GENERATION_ERROR);
+                        if let Err(error_code) = fragment.prepare(text) {
+                            return Err(error_code);
                         }
                         // Add the fragment to the play
                         self.fragments.push(fragment);
@@ -41,23 +46,20 @@ impl Play {
         Ok(())
     }
 
-    fn add_config(&mut self, config_line: &String, config: &mut ScriptConfig) {
+    fn add_config(&mut self, line: &String, config: &mut ScriptConfig) {
         // Ignore blank lines
-        if config_line.trim().is_empty() {
+        if line.trim().is_empty() {
             return;
         }
 
-        let tokens: Vec<&str> = config_line.split_whitespace().collect();
-
-        // for token in &tokens {
-        //     println!("{}", token);
-        // }
+        let tokens: Vec<&str> = line.split_whitespace().collect();
         
-        if tokens[0] == "[scene]" {
-            if tokens.len() == 1 {
+        if tokens[SCENE_SCRIPT_INDEX] == "[scene]" {
+            // Case 1: [scene] title
+            if tokens.len() == SCENE_SCRIPT_LENGTH - 1 {
                 // No scene title provided
                 if WHINGE_MODE.load(Ordering::SeqCst) {
-                    eprintln!("Warning: [scene]  without a scene title");
+                    eprintln!("Warning: [scene] without a scene title");
                 }
                 return;
             } else {
@@ -66,11 +68,11 @@ impl Play {
                 config.push((true, scene_title));
             }
         } else {
-            // First token is a configuration filename
-            let config_file = tokens[0].to_string();
-            config.push((false, config_file));
+            // Case 2: config filename
+            let config_filename = tokens[CONFIG_FILENAME_INDEX].to_string();
+            config.push((false, config_filename));
             
-            if tokens.len() > 1 && WHINGE_MODE.load(Ordering::SeqCst) {
+            if tokens.len() > CONFIG_SCRIPT_LENGTH && WHINGE_MODE.load(Ordering::SeqCst) {
                 eprintln!("Warning: Extra tokens after configuration file name: '{}'", tokens[1..].join(" "));
             }
         }
@@ -79,13 +81,13 @@ impl Play {
     pub fn read_config(&mut self, script_filename: &String, config: &mut ScriptConfig) -> Result<(), u8> {
         let mut script_lines: Vec<String> = Vec::new();
         
-        if let Err(_error_code) = grab_trimmed_file_lines(script_filename, &mut script_lines) {
-            return Err(SCRIPT_GENERATION_ERROR);
+        if let Err(error_code) = grab_trimmed_file_lines(script_filename, &mut script_lines) {
+            return Err(error_code);
         }
 
         if script_lines.is_empty() {
             eprintln!("Error: Script file '{}' contains no lines", script_filename);
-            return Err(SCRIPT_GENERATION_ERROR);
+            return Err(SCRIPT_PARSING_ERROR);
         }
         
         for line in &script_lines {
@@ -98,22 +100,22 @@ impl Play {
     pub fn prepare(&mut self, script_filename: &String) -> Result<(), u8> {
         let mut config: ScriptConfig = Vec::new();
         
-        if let Err(_error_code) = self.read_config(script_filename, &mut config) {
-            return Err(SCRIPT_GENERATION_ERROR);
+        if let Err(error_code) = self.read_config(script_filename, &mut config) {
+            return Err(error_code);
         }
         
-        if let Err(_error_code) = self.process_config(&config) {
-            return Err(SCRIPT_GENERATION_ERROR);
+        if let Err(error_code) = self.process_config(&config) {
+            return Err(error_code);
         }
 
         if self.fragments.is_empty() {
             eprintln!("Error: No scene fragments were created");
-            return Err(SCRIPT_GENERATION_ERROR);
+            return Err(SCRIPT_PARSING_ERROR);
         }
         
         if !self.fragments[0].has_title() {
             eprintln!("Error: First fragment must have a title");
-            return Err(SCRIPT_GENERATION_ERROR);
+            return Err(SCRIPT_PARSING_ERROR);
         }
         
         Ok(())
@@ -124,6 +126,7 @@ impl Play {
         
         for i in 0..num_fragments {
             if i == 0 {
+                // First fragment
                 self.fragments[i].enter_all();
             } else {
                 self.fragments[i].enter(&self.fragments[i - 1]);
@@ -132,11 +135,11 @@ impl Play {
             self.fragments[i].recite();
             
             if i == num_fragments - 1 {
+                // Final fragment
                 self.fragments[i].exit_all();
             } else {
                 self.fragments[i].exit(&self.fragments[i + 1]);
             }
         }
     }
-
 }

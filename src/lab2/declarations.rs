@@ -9,6 +9,7 @@ pub const VERBOSE_FLAG_INDEX: usize = 2;
 // exit codes
 pub const BAD_COMMAND_LINE_ERROR: u8 = 1;  
 pub const SCRIPT_GENERATION_ERROR: u8 = 2;
+pub const SCRIPT_PARSING_ERROR: u8 = 3;
 pub const SUCCESS: u8 = 0;  
 
 pub static WHINGE_MODE: AtomicBool = AtomicBool::new(false);
