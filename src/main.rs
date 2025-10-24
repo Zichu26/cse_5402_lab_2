@@ -1,3 +1,7 @@
+/// main.rs
+/// Author: Zichu Pan, Edgar Palomino
+/// Summary: This is the entry point for the program. It handles command-line argument 
+/// parsing and orchestrates the overall execution flow.
 use std::env;
 use std::sync::atomic::Ordering;
 

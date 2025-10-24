@@ -1,3 +1,7 @@
+/// scene_fragment.rs
+/// Author: Zichu Pan, Edgar Palomino
+/// Summary: This module  implements the SceneFragment structure that represents individual scenes within a play, 
+/// managing players (actors) and their dialogue.
 use std::sync::atomic::Ordering;
 use super::player::Player;
 use super::declarations::{WHINGE_MODE, CONFIG_PARSING_ERROR};
@@ -22,6 +26,9 @@ impl SceneFragment {
         }
     }
 
+    /// Instantiates Player objects:
+    /// - Creates a Player for each character
+    /// - Calls prepare() on each player with their script file
     pub fn process_config(&mut self, config: &PlayConfig) -> Result<(), u8> {
         for config_entry in config {
             match config_entry {
@@ -65,6 +72,10 @@ impl SceneFragment {
         }
     }
 
+    /// Parse configuration files:
+    /// - Each line should have exactly 2 tokens: character name and their script file
+    /// - Warns about malformed lines (too few/many tokens) in whinge mode
+    /// - Builds a PlayConfig with character-to-script mappings
     pub fn read_config(&mut self, config_filename: &String, config: &mut PlayConfig) -> Result<(), u8> {
         let mut config_lines: Vec<String> = Vec::new();
         
@@ -84,6 +95,10 @@ impl SceneFragment {
         Ok(())
     }
 
+    /// Main setup method that:
+    /// - Reads the configuration file for this scene
+    /// - Creates and prepares Player objects for each character
+    /// - Sorts players by line number
     pub fn prepare(&mut self, config_filename: &String) -> Result<(), u8> {
         let mut config: PlayConfig = Vec::new();
         
@@ -148,6 +163,12 @@ impl SceneFragment {
         }
     }
 
+    /// Orchestrates dialogue delivery:
+    /// - Repeatedly finds the player with the smallest next line number
+    /// - That player speaks their line
+    /// - Tracks expected line numbers to detect missing/duplicate lines
+    /// -  Warns about line number issues in whinge mode
+    /// - Continues until all players have delivered all lines
     pub fn recite(&mut self) {
         let mut current_speaker = String::new();
         let mut expected_line_number: usize = 0;

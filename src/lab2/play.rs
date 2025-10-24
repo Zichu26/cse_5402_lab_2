@@ -1,3 +1,6 @@
+/// play.rs
+/// Author: Zichu Pan, Edgar Palomino
+/// Summary: This module implements the core Play structure that orchestrates a performance by managing scene fragments.
 use std::sync::atomic::Ordering;
 use super::scene_fragment::SceneFragment;
 use super::declarations::{WHINGE_MODE, SCRIPT_PARSING_ERROR};
@@ -22,6 +25,9 @@ impl Play {
         }
     }
 
+    /// Converts the ScriptConfig into SceneFragment objects:
+    /// - Scene titles are stored temporarily
+    /// - Config filenames trigger creation of new fragments with the current title
     pub fn process_config(&mut self, config: &ScriptConfig) -> Result<(), u8> {
         let mut title = String::new();
         
@@ -46,6 +52,10 @@ impl Play {
         Ok(())
     }
 
+    /// Processes individual lines:
+    /// - Lines starting with [scene] are treated as scene titles
+    /// - Other non-blank lines are treated as configuration filenames
+    /// - Warns about missing scene titles or extra tokens (in whinge mode)
     fn add_config(&mut self, line: &String, config: &mut ScriptConfig) {
         // Ignore blank lines
         if line.trim().is_empty() {
@@ -78,6 +88,7 @@ impl Play {
         }
     }
 
+    /// Parses the script file line-by-line into a ScriptConfig
     pub fn read_config(&mut self, script_filename: &String, config: &mut ScriptConfig) -> Result<(), u8> {
         let mut script_lines: Vec<String> = Vec::new();
         
@@ -97,6 +108,10 @@ impl Play {
         Ok(())
     }
 
+    /// Main entry point that:
+    /// - Reads the script configuration file
+    /// - Parses it into scene fragments
+    /// - Validates that at least one fragment exists and the first has a title
     pub fn prepare(&mut self, script_filename: &String) -> Result<(), u8> {
         let mut config: ScriptConfig = Vec::new();
         
@@ -121,6 +136,10 @@ impl Play {
         Ok(())
     }
 
+    ///  Executes the play:
+    /// - Handles player entrances 
+    /// - Each fragment recites its lines
+    /// - Handles player exits 
     pub fn recite(&mut self) {
         let num_fragments = self.fragments.len();
         

@@ -1,3 +1,5 @@
+/// return_wrapper.rs
+/// Author: Zichu Pan, Edgar Palomino
 use std::process::{ExitCode, Termination};
 use super::declarations::SUCCESS;
 

@@ -1,3 +1,5 @@
+/// script_gen.rs
+/// Author: Zichu Pan, Edgar Palomino
 use std::fs::File;
 use std::io::BufReader;
 use std::io::BufRead;

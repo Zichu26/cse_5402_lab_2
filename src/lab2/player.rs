@@ -1,3 +1,7 @@
+/// player.rs
+/// Author: Zichu Pan, Edgar Palomino
+/// Summary: This module implements the Player structure that represents individual actors/characters in a play, 
+/// managing their dialogue lines and delivery.
 use std::sync::atomic::Ordering;
 use super::declarations::WHINGE_MODE;
 use super::script_gen::grab_trimmed_file_lines;
@@ -20,6 +24,12 @@ impl Player {
         }
     }
 
+    /// Parses individual script lines:
+    /// - Expects format: <line_number> <dialogue_text>
+    /// - Extracts line number from first token
+    /// - Stores the remaining text as dialogue
+    /// - Warns about invalid line numbers in whinge mode
+    /// - Ignores empty lines
     fn add_script_line(&mut self, line: &String) {
         // Ignore empty lines
         if line.is_empty() {
@@ -43,6 +53,10 @@ impl Player {
             }
     }
 
+    /// Loads the player's script:
+    /// - Reads lines from the character's script file
+    /// - Parses each line using add_script_line()
+    /// - Sorts lines by line number to handle out-of-order input
     pub fn prepare(&mut self, part_filename: &String) -> Result<(), u8> {
         let mut part_lines: Vec<String> = Vec::new();
         
@@ -61,6 +75,12 @@ impl Player {
         Ok(())
     }
 
+
+    /// Delivers the next line of dialogue:
+    /// - Checks if all lines have been spoken
+    /// - Prints character name if speaker changes
+    /// - Prints the dialogue text
+    /// - Advances the index to next line
     pub fn speak(&mut self, current_speaker: &mut String) {
         // return if all lines have already been spoken
         if self.index >= self.lines.len() {

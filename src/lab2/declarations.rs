@@ -1,3 +1,6 @@
+/// declarations.rs
+/// Author: Zichu Pan, Edgar Palomino
+/// Summary: Defines constants, exit codes and global state 
 use std::sync::atomic::AtomicBool;
 
 pub const MIN_ARGS: usize = 2;  // program_name script
