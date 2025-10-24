@@ -1,6 +1,7 @@
-/// declarations.rs
-/// Author: Zichu Pan, Edgar Palomino
-/// Summary: Defines constants, exit codes and global state 
+/// File Name: declarations.rs
+/// Authors: Zichu Pan and Edgar Palomino
+/// Summary: Defines constants, exit codes and global state
+
 use std::sync::atomic::AtomicBool;
 
 pub const MIN_ARGS: usize = 2;  // program_name script
@@ -18,5 +19,3 @@ pub const FAILED_TO_READ_LINE_FROM_FILE: u8 = 5;
 pub const SUCCESS: u8 = 0;  
 
 pub static WHINGE_MODE: AtomicBool = AtomicBool::new(false);
-
-

@@ -159,6 +159,17 @@ Running Provided Tests:
     Example CMDS:
         ../../target/debug/lab2 partial_hamlet_act_ii_script.txt
 
+Bash Scripts for Quick Testing:
 
+    To facilitate testing with the test cases we defined, we've provided 2 bash scripts:
+        lab2/test/test_script.sh
+        lab2/test/test_script_whinge.sh
 
+    These can be ran by moving into the lab2/test directory first and then executing them with ./ following the below usage:
+        test_script.sh [Start Number (defaults to 0)] [End Number (defaults to 13)]
+        test_script_whinge.sh [Start Number (defaults to 0)] [End Number (defaults to 13)]
 
+    IMPORTANT: It is crucial that these scripts are ran from the lab2/test directory for correct functionality and the range
+    defined with the Start and End command-line arguments is inclusive (with the default parameters Start=0 and End=13 running
+    the 14 tests we've described previously)
+        

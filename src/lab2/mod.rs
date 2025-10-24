@@ -1,6 +1,7 @@
-/// mod.rs
-/// Author: Zichu Pan, Edgar Palomino
-/// Summary: module declaration
+/// File Name: mod.rs
+/// Authors: Zichu Pan and Edgar Palomino
+/// Summary: Module declarations to allow for importing the lab2 module in main.rs
+
 pub mod declarations;
 pub mod script_gen;
 pub mod play;

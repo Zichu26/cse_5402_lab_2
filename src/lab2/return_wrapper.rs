@@ -1,6 +1,10 @@
-/// return_wrapper.rs
-/// Author: Zichu Pan, Edgar Palomino
+/// File Name: return_wrapper.rs
+/// Authors: Zichu Pan, Edgar Palomino
+/// Summary: This module implements the ReturnWrapper structure which is used in main.rs
+/// to wrap the result of the main() function.
+
 use std::process::{ExitCode, Termination};
+
 use super::declarations::SUCCESS;
 
 pub struct ReturnWrapper {
